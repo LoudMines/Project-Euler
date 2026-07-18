@@ -1,0 +1,70 @@
+import functools
+import inspect
+import time
+from numba import jit as jit
+
+try:
+    from IPython.display import display, Markdown
+except ImportError:
+    display = Markdown = None
+
+# Decorator for any solution function, this will add it to the functions which get tested
+# Setting make_fast to True uses numba jit on the function
+def solution(cls, message= None, first= False, best= False, make_fast= False, warmup_args=()):
+    def decorator(func):
+        name = func.__name__
+        target = jit(nopython=True, cache= True)(func) if make_fast else func
+
+        # Run jitted functions once to compile them.
+        target(*warmup_args)
+
+        def method(self):
+            result = target(*warmup_args)
+            if message is None:
+                text = f"{name}: {result}"
+            elif isinstance(message, str):
+                text = message.format(result=result)
+            else:
+                text = message(result)
+            return result, text
+        method._is_solution = True
+        method._is_first = first
+        method._is_best = best
+        setattr(cls, name, method)
+        return target
+    return decorator
+
+class Problem:
+    number: int = None
+    title: str = ""
+    description: str = ""
+
+    def describe(self):
+        text = f"## Problem {self.number}: {self.title}\n\n{self.description}"
+        if display and Markdown:
+            display(Markdown(text))
+        else:
+            print(text)
+
+    # Returns all the names of functions which have the solution decorator
+    def _solution_names(self):
+        return [
+            name for name in dir(type(self))
+            if not name.startswith("_")
+               and getattr(getattr(type(self), name), "_is_solution", False)
+        ]
+
+    def test_all(self):
+        names = self._solution_names()
+        if not names:
+            print("No solutions implemented yet.")
+            return
+        for name in names:
+            method = getattr(self, name)
+            start_time = time.time()
+            result, _ = method()
+            time_taken = time.time() - start_time
+            tag = (" (best)" if getattr(method, "_is_best", False) else
+                   " (first)" if getattr(method, "_is_first", False) else
+                   "")
+            print(f"{result} found in {time_taken:.6f} by {name}{tag}")
