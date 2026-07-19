@@ -1,2 +1,3 @@
 PROBLEM_FOLDER = "../Problems"
 PROBLEM_TEMPLATE = "../Problems/P.ipynb"
+PROBLEM_NB_VERSION = 4
