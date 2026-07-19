@@ -60,17 +60,18 @@ class Problem:
                and getattr(getattr(type(self), name), "_is_solution", False)
         ]
 
-    def test_all(self):
+    def test_all(self, repeats=1000):
         names = self._solution_names()
         if not names:
             print("No solutions implemented yet.")
             return
         for name in names:
             method = getattr(self, name)
-            start_time = time.time()
-            result, _ = method()
-            time_taken = time.time() - start_time
+            start_time = time.perf_counter()
+            for _ in range(repeats):
+                result, _ = method()
+            time_taken = (time.perf_counter() - start_time) / repeats * 1000
             tag = (" (best)" if getattr(method, "_is_best", False) else
                    " (first)" if getattr(method, "_is_first", False) else
                    "")
-            print(f"{result} found in {time_taken:.6f} by {name}{tag}")
+            print(f"{result} found in {time_taken:.6f} ms by {name}{tag}")
