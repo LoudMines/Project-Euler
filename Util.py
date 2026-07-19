@@ -10,10 +10,16 @@ except ImportError:
 
 # Decorator for any solution function, this will add it to the functions which get tested
 # Setting make_fast to True uses numba jit on the function
-def solution(cls, message= None, first= False, best= False, make_fast= False, warmup_args=()):
+def solution(cls, message= None,
+             first= False,
+             best= False,
+             make_fast= False,
+             jit_kwargs= None,
+             warmup_args=()):
+    jit_kwargs = jit_kwargs or {"nopython": True, "cache": True}
     def decorator(func):
         name = func.__name__
-        target = jit(nopython=True, cache= True)(func) if make_fast else func
+        target = jit(**jit_kwargs)(func) if make_fast else func
 
         # Run jitted functions once to compile them.
         target(*warmup_args)
