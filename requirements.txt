@@ -1,2 +1,4 @@
 numba
 nbformat
+beautifulsoup4
+cloudscraper
