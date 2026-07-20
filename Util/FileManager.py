@@ -1,4 +1,4 @@
-import Constants, Scraper
+from Util import Constants, Scraper
 import os
 import re
 import nbformat as nbf
@@ -29,7 +29,7 @@ def create_problem(number= None):
     if number in get_existing_problem_files():
         raise Exception(f"File for problem {number} already exists")
     next_problem = number if number else get_next_problem()
-    next_problem_filename = Constants.PROBLEM_FOLDER + "/P" + str(next_problem).zfill(3) + ".ipynb"
+    next_problem_filename = Constants.PROBLEM_FOLDER.joinpath("P" + str(next_problem).zfill(3) + ".ipynb")
 
     nb = nbf.read(Constants.PROBLEM_TEMPLATE, as_version= Constants.PROBLEM_NB_VERSION)
 
@@ -47,3 +47,5 @@ def create_problem(number= None):
             cell.source = cell.source.replace(placeholder, value)
 
     nbf.write(nb, next_problem_filename)
+
+    return f"✔️ Created the file for problem {next_problem}! (If you do not see it, press ctrl+alt+y) "

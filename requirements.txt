@@ -2,3 +2,5 @@ numba
 nbformat
 beautifulsoup4
 cloudscraper
+ipywidgets
+IPython
