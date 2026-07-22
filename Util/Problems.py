@@ -14,7 +14,7 @@ def solution(cls, message= None,
              make_fast= False,
              jit_kwargs= None,
              warmup_args=()):
-    jit_kwargs = jit_kwargs or {"nopython": True, "cache": True}
+    jit_kwargs = jit_kwargs or {"nopython": True}
     def decorator(func):
         name = func.__name__
         target = jit(**jit_kwargs)(func) if make_fast else func
