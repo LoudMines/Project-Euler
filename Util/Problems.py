@@ -22,15 +22,9 @@ def solution(cls, message= None,
         # Run jitted functions once to compile them.
         target(*warmup_args)
 
-        def method(self):
+        def method(_):
             result = target(*warmup_args)
-            if message is None:
-                text = f"{name}: {result}"
-            elif isinstance(message, str):
-                text = message.format(result=result)
-            else:
-                text = message(result)
-            return result, text
+            return result
         method._is_solution = True
         method._is_first = first
         method._is_best = best
@@ -67,7 +61,7 @@ class Problem:
             method = getattr(self, name)
             start_time = time.perf_counter()
             for _ in range(repeats):
-                result, _ = method()
+                result = method()
             time_taken = (time.perf_counter() - start_time) / repeats * 1000
             tag = (" (best)" if getattr(method, "_is_best", False) else
                    " (first)" if getattr(method, "_is_first", False) else
