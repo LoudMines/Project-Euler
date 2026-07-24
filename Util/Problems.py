@@ -1,5 +1,5 @@
 import time
-from numba import jit as jit
+from numba import njit as njit
 
 try:
     from IPython.display import display, Markdown
@@ -14,10 +14,10 @@ def solution(cls, message= None,
              make_fast= False,
              jit_kwargs= None,
              warmup_args=()):
-    jit_kwargs = jit_kwargs or {"nopython": True}
+    jit_kwargs = jit_kwargs or {}
     def decorator(func):
         name = func.__name__
-        target = jit(**jit_kwargs)(func) if make_fast else func
+        target = njit(**jit_kwargs)(func) if make_fast else func
 
         # Run jitted functions once to compile them.
         target(*warmup_args)
