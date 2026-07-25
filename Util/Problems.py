@@ -1,4 +1,6 @@
 import time
+
+from PIL.ImageChops import constant
 from numba import njit as njit
 
 try:
@@ -8,7 +10,7 @@ except ImportError:
 
 # Decorator for any solution function, this will add it to the functions which get tested
 # Setting make_fast to True uses numba jit on the function
-def solution(cls, message= None,
+def solution(cls,
              first= False,
              best= False,
              make_fast= False,
