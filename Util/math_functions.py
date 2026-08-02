@@ -237,3 +237,40 @@ def sieve_sundaram(n):
         s = (p * p - 1) // 2
         prime_mask[s:k + 1: p] = False
     return np.concatenate((np.array([2]), (2 * np.where(prime_mask)[0] + 1)))
+
+"""
+-------------------- Prime factorisation --------------------
+Functions for factorisation. The prime factorisation was extracted from P003 as it worked best there, but I have not
+investigated if it is optimal (it's probably not) this warrants further investigation but for now it will suffice.
+
+"""
+
+@njit
+def get_prime_factors(n):
+    i = 2
+    remainder = n
+    prime_factors = []
+    while True:
+        if remainder % i == 0:
+            remainder /= i
+            prime_factors.append(i)
+        elif i == 2:
+            i += 1
+        else:
+            i += 2
+        if remainder == 1:
+            break
+    return prime_factors
+
+"""
+-------------------- Triangular numbers --------------------
+
+"""
+
+@njit
+def get_triangular_number(n):
+    return n * (n + 1) // 2
+
+@njit
+def get_triangular_root(number):
+    return (math.sqrt(8 * number + 1) - 1) / 2
