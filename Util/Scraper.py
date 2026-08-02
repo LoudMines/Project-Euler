@@ -1,5 +1,6 @@
 import cloudscraper
 from bs4 import BeautifulSoup
+import html
 
 scraper = cloudscraper.create_scraper()
 
@@ -22,11 +23,12 @@ def get_problem_info(number):
 
     paragraphs = [
         str(child)
-        for child in content_div.find_all(recursive=False)
-        if child.get_text(strip=True)
+        for child in content_div.contents
+        if str(child).strip()
     ]
 
     description = "".join(paragraphs) if paragraphs else str(content_div)
+    description = html.unescape(description)
     description = description.replace("\\", "\\\\")
 
     return title, description
