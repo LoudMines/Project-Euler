@@ -2,6 +2,25 @@ import math
 from numba import njit
 import numpy as np
 
+"""
+-------------------- Numba nonsense --------------------
+For functions which already exist in default python, but due to numba are unavailable to me, such as turning a string 
+into an integer. 
+"""
+
+# Numba uses 64 bit ints, so this only works up to ints of size 18.446.744.073.709.551.616
+@njit
+def string_to_int(string):
+    running_int = 0
+    for c in string:
+        running_int = running_int * 10 + ord(c) - 48  # 48 = ord('0')
+    return running_int
+
+"""
+-------------------- General prime functions --------------------
+Non-specific prime functions such as checking if a number is prime
+"""
+
 @njit
 def is_prime(n):
     if n < 2:
