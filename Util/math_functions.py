@@ -17,6 +17,19 @@ def string_to_int(string):
     return running_int
 
 """
+-------------------- General functions --------------------
+Most of these will exist in the math module, but do not have a numba compatible version
+"""
+
+@njit
+def factorial(n):
+    result = 1
+    while n > 1:
+        result *= n
+        n -= 1
+    return result
+
+"""
 -------------------- General prime functions --------------------
 Non-specific prime functions such as checking if a number is prime
 """
