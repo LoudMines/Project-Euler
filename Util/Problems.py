@@ -79,6 +79,8 @@ class Problem:
                    "")
             print(f"{result} found after {method_repeats} test{plural} in {time_taken:.6f} ms by {name}{tag}")
 
+    # If a solution is very slow, it's max_tests can be set to 0 so it won't get tested each time. This function can
+    # then be used to run the function once and save the result, so it can be used in comparisons.
     def test_once(self, solution_to_test):
         method = getattr(self, solution_to_test)
         start_time = time.perf_counter()
