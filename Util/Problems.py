@@ -14,6 +14,7 @@ def solution(cls,
              first= False,
              best= False,
              make_fast= False,
+             max_tests = None,
              jit_kwargs= None,
              warmup_args=()):
     jit_kwargs = jit_kwargs or {}
@@ -30,6 +31,7 @@ def solution(cls,
         method._is_solution = True
         method._is_first = first
         method._is_best = best
+        if max_tests is not None: method._max_tests = max_tests
         setattr(cls, name, method)
         return target
     return decorator
@@ -38,6 +40,7 @@ class Problem:
     number: int = None
     title: str = ""
     description: str = ""
+    separate_test_results = {}
 
     def describe(self):
         text = f"## Problem {self.number}: {self.title}\n\n{self.description}"
@@ -61,11 +64,29 @@ class Problem:
             return
         for name in names:
             method = getattr(self, name)
+            method_repeats = getattr(method, "_max_tests", repeats)
+            if method_repeats == 0:
+                if name in self.separate_test_results:
+                    print(self.separate_test_results[name])
+                continue
+            plural = "s" if method_repeats > 1 else ""
             start_time = time.perf_counter()
-            for _ in range(repeats):
+            for _ in range(method_repeats):
                 result = method()
-            time_taken = (time.perf_counter() - start_time) / repeats * 1000
+            time_taken = (time.perf_counter() - start_time) / method_repeats * 1000
             tag = (" (best)" if getattr(method, "_is_best", False) else
                    " (first)" if getattr(method, "_is_first", False) else
                    "")
-            print(f"{result} found in {time_taken:.6f} ms by {name}{tag}")
+            print(f"{result} found after {method_repeats} test{plural} in {time_taken:.6f} ms by {name}{tag}")
+
+    def test_once(self, solution_to_test):
+        method = getattr(self, solution_to_test)
+        start_time = time.perf_counter()
+        result = method()
+        time_taken = (time.perf_counter() - start_time) * 1000
+        tag = (" (best)" if getattr(method, "_is_best", False) else
+               " (first)" if getattr(method, "_is_first", False) else
+               "")
+        result_string = f"{result} found after a separate test in {time_taken:.6f} ms by {solution_to_test}{tag}"
+        self.separate_test_results[solution_to_test] = result_string
+        print(result_string)
