@@ -29,6 +29,10 @@ def factorial(n):
         n -= 1
     return result
 
+@njit
+def get_digit(number, digit):
+    return number // 10 ** digit % 10
+
 """
 -------------------- General prime functions --------------------
 Non-specific prime functions such as checking if a number is prime
