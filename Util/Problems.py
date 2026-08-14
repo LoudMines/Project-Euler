@@ -2,6 +2,7 @@ import time
 
 from PIL.ImageChops import constant
 from numba import njit as njit
+from numba import jit as jit
 
 try:
     from IPython.display import display, Markdown
@@ -20,7 +21,10 @@ def solution(cls,
     jit_kwargs = jit_kwargs or {}
     def decorator(func):
         name = func.__name__
-        target = njit(**jit_kwargs)(func) if make_fast else func
+        if jit_kwargs:
+            target = jit(**jit_kwargs)(func) if make_fast else func
+        else:
+            target = njit()(func) if make_fast else func
 
         # Run jitted functions once to compile them.
         target(*warmup_args)
