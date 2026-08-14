@@ -298,6 +298,43 @@ def get_prime_factors(n):
             break
     return prime_factors
 
+# Returns the prime factors but as a numpy array. This function is ever so slightly slower, but np arrays are faster
+# To work with than lists
+@njit
+def get_np_prime_factors(n):
+    i = 2
+    remainder = n
+    prime_factors = np.empty(int(math.log(n)), dtype=np.int_)
+    factor_index = 0
+    while True:
+        if remainder % i == 0:
+            remainder /= i
+            prime_factors[factor_index] = i
+            factor_index += 1
+        elif i == 2:
+            i += 1
+        else:
+            i += 2
+        if remainder == 1:
+            break
+    return prime_factors[:factor_index]
+
+@njit
+def get_divisors(n):
+    number = 1
+    divisor_index = 0
+    divisors = np.empty(n, dtype=np.int_)
+    while number * number <= n:
+        if n % number == 0:
+            divisors[divisor_index] = number
+            divisor_index += 1
+            number_pair = n // number
+            if number_pair != number:
+                divisors[divisor_index] = number_pair
+                divisor_index += 1
+        number += 1
+    return divisors[:divisor_index]
+
 """
 -------------------- Triangular numbers --------------------
 
