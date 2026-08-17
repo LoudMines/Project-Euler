@@ -3,6 +3,13 @@ from numba import njit
 import numpy as np
 
 """
+-------------------- Constants --------------------
+Some mathematical constants can be calculated easily and are used more often
+"""
+
+PHI = (1 + math.sqrt(5)) / 2
+
+"""
 -------------------- Numba nonsense --------------------
 For functions which already exist in default python, but due to numba are unavailable to me, such as turning a string 
 into an integer. 
@@ -347,3 +354,12 @@ def get_triangular_number(n):
 @njit
 def get_triangular_root(number):
     return (math.sqrt(8 * number + 1) - 1) / 2
+
+"""
+-------------------- Fibonacci numbers --------------------
+
+"""
+# This method to find the nth Fibonacci number is taken from P002, see that file for further details.
+@njit
+def fibonacci(n):
+    return int(round((PHI ** n)/math.sqrt(5)))
