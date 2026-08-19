@@ -20,7 +20,7 @@ def problem_creator():
         button.tooltip = tooltip
         button.icon = icon
 
-    def on_button_click(button, button_info, problem_number=None):
+    def on_button_click(button, button_info, problem_number=None, creating = True):
         # Disable and show loading state
         button.disabled = True
         button.description = "Creating file..."
@@ -29,7 +29,10 @@ def problem_creator():
 
         threading.Thread(target=reset_button, args=(button, *button_info, True)).start()
 
-        problem_output = FileManager.create_problem(problem_number)
+        if creating:
+            problem_output = FileManager.create_problem(problem_number)
+        else:
+            problem_output = FileManager.rerun_problem(problem_number)
 
         status_label.value= problem_output
 
@@ -77,9 +80,28 @@ def problem_creator():
         )
     )
 
-    accordion = widgets.Accordion(children=[specific_problem_box],
-                                  layout=widgets.Layout(width="100%", margin="14px 0 0 0"))
-    accordion.set_title(0, "Create a specific problem")
+    def on_rerun_problem(button):
+        on_button_click(button, rerun_button_info, rerun_text_box.value, False)
+
+    rerun_button = widgets.Button()
+    rerun_button_info = ["Re-test", "Run a new test on the specified problem", "refresh"]
+    reset_button(rerun_button, *rerun_button_info)
+    rerun_button.on_click(on_rerun_problem)
+
+    rerun_text_box = widgets.IntText()
+    rerun_box = widgets.HBox(
+        children=[rerun_text_box, rerun_button],
+        layout=widgets.Layout(
+            align_items="center",
+            justify_content="space-between",
+            width="100%",
+            padding="14px 18px"
+        )
+    )
+
+    accordion = widgets.Accordion(children=[specific_problem_box, rerun_box],
+                                  layout=widgets.Layout(width="100%", margin="14px 0 0 0"),
+                                  titles= ("Create a specific problem", "Rerun the tests for a specific problem"))
 
     status_label = widgets.Label(
         value="",
@@ -122,39 +144,5 @@ def problem_table():
 
     progress = tqdm()
     df = build_dataframe(FileManager.get_problem_results(progress))
-
-    # refresh_button = widgets.Button(description="Refresh", icon="refresh",
-    #                                  tooltip="Reload results from the database")
-    #
-    # def on_refresh(button):
-    #     df = build_dataframe(FileManager.get_problem_results())
-    #
-    # refresh_button.on_click(on_refresh)
-    #
-    # header = widgets.HBox(
-    #     children=[
-    #         widgets.HTML(value="<span style='font-size:17px;'>Solved problems:</span>"),
-    #         refresh_button,
-    #     ],
-    #     layout=widgets.Layout(
-    #         align_items="center",
-    #         justify_content="space-between",
-    #         width="100%",
-    #         padding="0 4px 8px 4px",
-    #     )
-    # )
-    #
-    # total_problem_table_box = widgets.VBox(
-    #     children=[header],
-    #     layout=widgets.Layout(align_items="stretch", width="100%")
-    # )
-    #
-    # page_wrapper = widgets.Box(
-    #     children=[total_problem_table_box],
-    #     layout=widgets.Layout(padding="14px 0 0 0", width="100%")
-    # )
-    #
-    # with out:
-    #     display(page_wrapper)
 
     return df
