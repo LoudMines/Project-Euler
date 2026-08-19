@@ -2,6 +2,9 @@ import Util.FileManager as FileManager
 import ipywidgets as widgets
 import time
 import threading
+import pandas as pd
+# from ipydatagrid import DataGrid, TextRenderer, GridStyle
+from tqdm import tqdm
 
 try:
     from IPython.display import display, clear_output
@@ -100,3 +103,58 @@ def problem_creator():
     )
 
     return page_wrapper
+
+def problem_table():
+    def build_dataframe(results):
+        rows = []
+        for result in results:
+            rows.append({
+                # "Number": result["number"], # This is not required as the key is equal to the problem number
+                "Title": result["title"],
+                "Description": result["description"],
+                "Time (ms)": result["time_ms"],
+                "Solver": result["solver"],
+                "First": result["is_first"],
+                "Last tested": result["tested_at"]
+            })
+        df = pd.DataFrame(rows, columns=["Title", "Description", "Time (ms)", "Solver", "First","Last tested"])
+        return df
+
+    progress = tqdm()
+    df = build_dataframe(FileManager.get_problem_results(progress))
+
+    # refresh_button = widgets.Button(description="Refresh", icon="refresh",
+    #                                  tooltip="Reload results from the database")
+    #
+    # def on_refresh(button):
+    #     df = build_dataframe(FileManager.get_problem_results())
+    #
+    # refresh_button.on_click(on_refresh)
+    #
+    # header = widgets.HBox(
+    #     children=[
+    #         widgets.HTML(value="<span style='font-size:17px;'>Solved problems:</span>"),
+    #         refresh_button,
+    #     ],
+    #     layout=widgets.Layout(
+    #         align_items="center",
+    #         justify_content="space-between",
+    #         width="100%",
+    #         padding="0 4px 8px 4px",
+    #     )
+    # )
+    #
+    # total_problem_table_box = widgets.VBox(
+    #     children=[header],
+    #     layout=widgets.Layout(align_items="stretch", width="100%")
+    # )
+    #
+    # page_wrapper = widgets.Box(
+    #     children=[total_problem_table_box],
+    #     layout=widgets.Layout(padding="14px 0 0 0", width="100%")
+    # )
+    #
+    # with out:
+    #     display(page_wrapper)
+
+    return df

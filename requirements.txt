@@ -5,3 +5,6 @@ cloudscraper
 ipywidgets
 IPython
 numpy
+tqdm
+pandas
+itables

@@ -61,27 +61,56 @@ class Problem:
                and getattr(getattr(type(self), name), "_is_solution", False)
         ]
 
+    def get_results(self, repeats=1000):
+        names = self._solution_names()
+        results = []
+        for name in names:
+            method = getattr(self, name)
+            method_repeats = getattr(method, "_max_tests", repeats)
+            if method_repeats == 0:
+                continue
+            start_time = time.perf_counter()
+            for _ in range(method_repeats):
+                result = method()
+            time_taken = (time.perf_counter() - start_time) / method_repeats * 1000
+            results.append({
+                "name": name,
+                "result": result,
+                "time_ms": time_taken,
+                "repeats": method_repeats,
+                "is_best": getattr(method, "_is_best", False),
+                "is_first": getattr(method, "_is_first", False),
+            })
+        return results
+
+
     def test_all(self, repeats=1000):
         names = self._solution_names()
         if not names:
             print("No solutions implemented yet.")
             return
+
+        printed = False
+        for result in self.get_results(repeats):
+            plural = "s" if result["repeats"] > 1 else ""
+            tag = (" (best)" if result["is_best"] else
+                   " (first)" if result["is_first"] else
+                   "")
+            print(f"{result['result']} found after "
+                  f"{result['repeats']} test{plural} in "
+                  f"{result['time_ms']:.6f} ms by "
+                  f"{result['name']}{tag}")
+            printed = True
+
+
         for name in names:
             method = getattr(self, name)
-            method_repeats = getattr(method, "_max_tests", repeats)
-            if method_repeats == 0:
+            if getattr(method, "_max_tests", repeats) == 0:
                 if name in self.separate_test_results:
                     print(self.separate_test_results[name])
-                continue
-            plural = "s" if method_repeats > 1 else ""
-            start_time = time.perf_counter()
-            for _ in range(method_repeats):
-                result = method()
-            time_taken = (time.perf_counter() - start_time) / method_repeats * 1000
-            tag = (" (best)" if getattr(method, "_is_best", False) else
-                   " (first)" if getattr(method, "_is_first", False) else
-                   "")
-            print(f"{result} found after {method_repeats} test{plural} in {time_taken:.6f} ms by {name}{tag}")
+                    printed = True
+        if not printed:
+            print("No solutions implemented yet.")
 
     # If a solution is very slow, it's max_tests can be set to 0 so it won't get tested each time. This function can
     # then be used to run the function once and save the result, so it can be used in comparisons.
