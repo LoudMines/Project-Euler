@@ -27,7 +27,8 @@ def solution(cls,
             target = njit()(func) if make_fast else func
 
         # Run jitted functions once to compile them.
-        target(*warmup_args)
+        if make_fast:
+            target(*warmup_args)
 
         def method(_):
             result = target(*warmup_args)
